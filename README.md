@@ -42,20 +42,29 @@ The code is designed to facilitate easy modification. Each component is implemen
 
 Clone the repository:
 ```bash
-git clone https://github.com/eustlb/speech-to-speech.git
+git clone https://github.com/huggingface/speech-to-speech.git
 cd speech-to-speech
 ```
 
-Install the required dependencies:
+Install the required dependencies using [uv](https://github.com/astral-sh/uv):
 ```bash
-pip install -r requirements.txt
+uv pip install -r requirements.txt
 ```
 
 ## Usage
 
 The pipeline can be run in two ways:
 - **Server/Client approach**: Models run on a server, and audio input/output are streamed from a client.
-- **Local approach**: Uses the same client/server method but with the loopback address.
+- **Local approach**: Runs locally.
+
+### Docker Server
+
+#### Install the NVIDIA Container Toolkit
+
+https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
+
+#### Start the docker container
+```docker compose up```
 
 ### Docker Server
 
@@ -73,21 +82,24 @@ To run the pipeline on the server:
 python s2s_pipeline.py --recv_host 0.0.0.0 --send_host 0.0.0.0
 ```
 
-Then run the client locally to handle sending microphone input and receiving generated audio:
+Then run the pipeline locally:
 ```bash
-python listen_and_play.py --host <IP address of your server>
+python s2s_pipeline.py --mode local
 ```
 
-### Local Approach
-Simply use the loopback address:
+### Running on Mac
+To run on mac, we recommend setting the flag `--local_mac_optimal_settings`:
 ```bash
-python s2s_pipeline.py --recv_host localhost --send_host localhost
-python listen_and_play.py --host localhost
+python s2s_pipeline.py --local_mac_optimal_settings
 ```
 
-You can pass `--device mps` to run it locally on a Mac.
+You can also pass `--device mps` to have all the models set to device mps.
+The local mac optimal settings set the mode to be local as explained above and change the models to:
+- LightningWhisperMLX
+- MLX LM
+- MeloTTS
 
-### Recommended usage
+### Recommended usage with Cuda
 
 Leverage Torch Compile for Whisper and Parler-TTS:
 
